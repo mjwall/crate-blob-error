@@ -14,9 +14,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-// pretty much the class from
-// https://github.com/crate/crate-java-testing/blob/48609a8bd239a110776f84c1a82bd0d7affa395b/src/test/java/io/crate/integrationtests/BaseTest.java
-// but it doesn't look like this is packaged into a testing artifact
+// Copied from https://goo.gl/nnYFNP because it doesn't appear to packaged
+// as an artifact anywhere.  Couple of NOTEs about what I changed below
 public class BaseTest {
 
     static {
@@ -27,6 +26,8 @@ public class BaseTest {
     }
 
     private static final int DEFAULT_TIMEOUT_MS = 10_000;
+
+    // NOTE: made url protected so I could access it in subclass
     protected static URL url;
 
     protected static void prepare(CrateTestCluster crateCluster) throws MalformedURLException {
@@ -34,7 +35,8 @@ public class BaseTest {
         url = new URL(String.format("http://%s:%d/_sql", server.crateHost(), server.httpPort()));
     }
 
-    protected JsonObject execute(String statement) throws IOException {
+    // NOTE: made this static so I could call from a static method on the subclass
+    protected static JsonObject execute(String statement) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
 
