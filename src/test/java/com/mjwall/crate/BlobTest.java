@@ -1,9 +1,7 @@
 package com.mjwall.crate;
 
 import io.crate.testing.CrateTestCluster;
-import io.crate.testing.CrateTestServer;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
@@ -30,13 +28,12 @@ public class BlobTest extends BaseTest {
     private Executor executor = null;
     private String crateUrl = null;
 
-    @ClassRule // wants to run on 4200
+    @ClassRule
     public static final CrateTestCluster TEST_CLUSTER =
             CrateTestCluster.fromVersion("2.3.3")
                     .clusterName("with-builder")
                     .numberOfNodes(1)
                     .build();
-
 
     @Before
     public void setUp() {
@@ -51,7 +48,6 @@ public class BlobTest extends BaseTest {
 
         executor = Executor.newInstance();
 
-        // create blob table - ok to run again
         try {
             execute("create blob table " + TABLENAME);
         } catch (IOException e) {
