@@ -11,7 +11,7 @@ What is happening is this:
 
 From that point on any call that hits the same IP address is one response behind. 
 
-And if you get another 404, the calls become 2 behind as seen in testSeveralCallsAfterMultiple404.
+And if you get another 404, the calls become 2 behind as seen in [testSeveralCallsAfterMultiple404](https://github.com/mjwall/crate-blob-error/blob/master/src/test/java/com/mjwall/crate/BlobTest.java#L111).
 
 ## Clients
 
@@ -21,7 +21,7 @@ at least Go has this issue too, see https://github.com/herenow/go-crate/issues/2
 
 ## Demonstration
 
-The error has been demonstrated with BlobTest.  Simply running
+The error has been demonstrated with [BlobTest](https://github.com/mjwall/crate-blob-error/blob/master/src/test/java/com/mjwall/crate/BlobTest.java).  Simply running
 
 ```
 mvn clean test
@@ -40,3 +40,5 @@ Tests run: 6, Failures: 3, Errors: 0, Skipped: 0
 ```
 
 In my research, I came across https://github.com/crate/crate/issues/3128 whose fix may have exposed this bug.
+
+I copied [BaseTest](https://github.com/crate/crate-java-testing/blob/48609a8bd239a110776f84c1a82bd0d7affa395b/src/test/java/io/crate/integrationtests/BaseTest.java) from crate-java-testing and found that useful.  There are some notes in there about what I changed. 
