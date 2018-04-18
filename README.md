@@ -1,5 +1,9 @@
 # Test case to show a bug with Crate blob calls
 
+## Crate bug
+
+Filed https://github.com/crate/crate/issues/7185
+
 ## Description of the problem
 
 What is happening is this:
