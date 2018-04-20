@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 
 public class BlobTest extends BaseTest {
 
-    public static String CRATE_VERSION = "2.3.3";
+    public static String CRATE_VERSION = "3.0.0-SNAPSHOT";
     public static String TABLENAME = "myblob";
 
     // pre computed sha1 values for string A, B, C and D
@@ -50,13 +50,8 @@ public class BlobTest extends BaseTest {
             throw new RuntimeException("Unable to start crate, stopping", e);
         }
 
-        try {
-            execute("create blob table " + TABLENAME);
-        } catch (IOException e) {
-            throw new RuntimeException("Could not create table, stopping", e);
-        }
-
         BlobClient staticClient = new BlobClient(URL, TABLENAME); // this client only used to insert data
+        staticClient.createBlobTable();
         staticClient.insertBlob(SHA1_A, "A");
         staticClient.insertBlob(SHA1_C, "C");
         staticClient.insertBlob(SHA1_D, "D");
@@ -110,11 +105,11 @@ public class BlobTest extends BaseTest {
     // this continues, the 4th call returns the 3rd calls response, the 5th returns the 4th and so on
     public void testSeveralCallsAfterMultiple404() {
         assertEquals(404, client.getBlob(SHA1_B).getStatusLine().getStatusCode());
-        assertEquals(404, client.getBlob(SHA1_A).getStatusLine().getStatusCode()); // should be A
-        assertEquals("A", client.getBlobString(SHA1_B)); // this should be a 404 but is actually A
-        assertEquals(404, client.getBlob(SHA1_A).getStatusLine().getStatusCode()); // should be A
-        assertEquals(404, client.getBlob(SHA1_C).getStatusLine().getStatusCode()); // should be C
-        assertEquals("D", client.getBlobString(SHA1_D)); // this is now 2 calls behind and is returning the A
+        assertEquals("A", client.getBlobString(SHA1_A));
+        assertEquals(404, client.getBlob(SHA1_B).getStatusLine().getStatusCode());
+        assertEquals("A", client.getBlobString(SHA1_A));
+        assertEquals("C", client.getBlobString(SHA1_C));
+        assertEquals("D", client.getBlobString(SHA1_D));
     }
 
     @Test
@@ -182,6 +177,22 @@ public class BlobTest extends BaseTest {
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException("Could not insert " + content + " with digest of " + digest, e);
+            }
+        }
+
+        public void createBlobTable() {
+            Request request = Request.Post(this.url + "_sql?pretty")
+                    .addHeader("Content-Type", "application/json")
+                    .bodyString("{\"stmt\":\"create blob table " + this.tableName + "\"}", ContentType.TEXT_PLAIN);
+            try {
+                Response response = executor.execute(request);
+                int code = response.returnResponse().getStatusLine().getStatusCode();
+                if (code != 200) {
+                    throw new RuntimeException("Response code " + code + " creating table " + this.tableName);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Could not create table " + this.tableName, e);
             }
         }
     }
